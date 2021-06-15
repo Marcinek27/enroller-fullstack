@@ -26,12 +26,20 @@
         props: ['username'],
         data() {
             return {
-                meetings: []
+                meetings: [],
+                message: ''
             };
         },
         methods: {
-            addNewMeeting(meeting) {
-                this.meetings.push(meeting);
+            addNewMeeting(newMeeting) {
+                // this.meetings.push(meeting);
+
+                this.$http.post('meetings', newMeeting)
+                    .then(() => {
+                        this.meetings.push(newMeeting);
+                        this.success('Spotkanie zostało dodane.');
+                    })
+                    .catch(response => this.failure('Błąd przy dodawaniu spotkania. Kod odpowiedzi: ' + response.status));
             },
             addMeetingParticipant(meeting) {
                 meeting.participants.push(this.username);
@@ -41,6 +49,14 @@
             },
             deleteMeeting(meeting) {
                 this.meetings.splice(this.meetings.indexOf(meeting), 1);
+            },
+            success(message) {
+                this.message = message;
+                this.isError = false;
+            },
+            failure(message) {
+                this.message = message;
+                this.isError = true;
             }
         }
     }
