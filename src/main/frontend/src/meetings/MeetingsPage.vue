@@ -27,19 +27,12 @@
         data() {
             return {
                 meetings: [],
-                message: ''
             };
         },
         methods: {
-            addNewMeeting(newMeeting) {
-                // this.meetings.push(meeting);
-
-                this.$http.post('meetings', newMeeting)
-                    .then(() => {
-                        this.meetings.push(newMeeting);
-                        this.success('Spotkanie zostało dodane.');
-                    })
-                    .catch(response => this.failure('Błąd przy dodawaniu spotkania. Kod odpowiedzi: ' + response.status));
+            addNewMeeting(meeting) {
+                this.$http.post('meetings', meeting)
+                    .then(response => this.meetings.push(response.body));
             },
             addMeetingParticipant(meeting) {
                 meeting.participants.push(this.username);
@@ -48,16 +41,18 @@
                 meeting.participants.splice(meeting.participants.indexOf(this.username), 1);
             },
             deleteMeeting(meeting) {
-                this.meetings.splice(this.meetings.indexOf(meeting), 1);
+                this.$http.delete('meetings/' + meeting.id)
+                    .then(response => {
+                        this.getMeetings()
+                    });
             },
-            success(message) {
-                this.message = message;
-                this.isError = false;
-            },
-            failure(message) {
-                this.message = message;
-                this.isError = true;
+            getMeetings() {
+                this.$http.get('meetings')
+                .then(response => this.meetings = response.body);
             }
+        },
+        created() {
+            this.getMeetings();
         }
     }
 </script>

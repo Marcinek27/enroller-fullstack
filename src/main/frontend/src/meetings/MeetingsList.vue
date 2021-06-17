@@ -9,7 +9,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr v-for="meeting in meetings" :key="meeting.title">
+    <tr v-for="meeting in meetings" :key="meeting.id">
       <td>{{ meeting.title }}</td>
       <td>{{ meeting.description }}</td>
       <td>
@@ -20,12 +20,15 @@
         </ul>
       </td>
       <td style="text-align: right; min-width: 400px">
-        <button v-if="meeting.participants.indexOf(username) < 0" class="button-outline"
-                @click="$emit('attend', meeting)">
+        <!-- <button v-if="meeting.participants.indexOf(username) < 0" class="button-outline"
+                @click="$emit('attend', meeting)"> -->
+        <button v-if="!ifEnrolled(username, meeting)" class="button-outline" @click="$emit('attend', meeting)">
           Zapisz się
         </button>
-        <button v-else class="button-outline" @click="$emit('unattend', meeting)">Wypisz się</button>
-        <button v-if="meeting.participants.length === 0" class="button" @click="$emit('delete', meeting)">
+        <!-- <button v-else class="button-outline" @click="$emit('unattend', meeting)">Wypisz się</button> -->
+        <!-- <button v-if="meeting.participants.length === 0" class="button" @click="$emit('delete', meeting)"> -->
+        <button v-if="ifEnrolled(username, meeting)" class="button-outline" @click="$emit('unattend', meeting)">Wypisz się</button>
+        <button v-if="meeting.participants == null || meeting.participants.length == 0" class="button" @click="$emit('delete', meeting)">
           Usuń puste spotkanie
         </button>
       </td>
@@ -36,6 +39,16 @@
 
 <script>
     export default {
-        props: ['meetings', 'username']
+        props: ['meetings', 'username'],
+        methods: {
+          ifEnrolled(username, meeting){
+            for (let participant in meeting.participants){
+              if(participant.name === "username") {
+                return true;
+              }
+            }
+            return false;
+          }
+        }
     }
 </script>
